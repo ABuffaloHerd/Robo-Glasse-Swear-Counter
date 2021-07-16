@@ -118,4 +118,4 @@ async def on_message(message):
 
 
 
-bot.run('ODY1MzY2MDIzNTcwMDYzMzcw.YPC86Q.6QQ2VOjDE2A1KgQ_6mLHF-c_XGo')
+bot.run('penis')
