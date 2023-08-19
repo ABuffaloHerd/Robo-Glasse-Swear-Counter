@@ -66,6 +66,7 @@ async def on_guild_remove(guild):
 
 @bot.event(name="on_message_create")
 async def on_message(message):
+    now = datetime.datetime.now()
     if message.author.bot:
         return
     
@@ -80,9 +81,13 @@ async def on_message(message):
         await ctx.send(f"**{message.author.mention}** has said the n-word {total} {'time' if total == 1 else 'times'}, {nwords[1]} of which {'was' if nwords[1] == 1 else 'were'} a hard r!")
         insert_json_db(str(message.author.mention), nwords[0], nwords[1])
 
+    done = datetime.datetime.now()
+    print(f"nword detect took {done - now} seconds")
+
 
 @bot.event(name="on_message_create")
 async def on_message_custom(message):
+    now = datetime.datetime.now()
     if message.author.bot:
         return
     
@@ -100,6 +105,9 @@ async def on_message_custom(message):
             msg += f"`{word} x {words[word]}`\n "
 
         await ctx.send(msg)
+    
+    done = datetime.datetime.now()
+    print(f"generic word detect took {done - now} seconds")
 
 
 @bot.command(
@@ -314,7 +322,7 @@ async def leaderboard(ctx, word: str):
     ordinals = ["1st", "2nd", "3rd", "4th", "5th"]
     embed = CustomEmbed(
         title="Leaderboard",
-        description=f"Top 3 users for the word `{word}`",
+        description=f"Top 5 users for the word `{word}`",
         color=0xFF00FF,
         # data[0][0] is the user's name, data[0][1] is the user's count
         fields=[
