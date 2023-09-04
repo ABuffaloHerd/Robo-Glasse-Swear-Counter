@@ -8,6 +8,7 @@ import datetime
 from interactions.ext.tasks import IntervalTrigger, create_task
 
 from swear_detector import nword_counter, load_definitions, insert_json_db, get_json_db
+from config import *
 from embed import CustomEmbed
 from word_detector import *
 from misc import *
@@ -20,6 +21,13 @@ TOKEN = os.getenv("TOKEN")
 
 intents = discord.Intents.default()
 bot = interactions.Client(token=TOKEN, intents=interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGE_CONTENT)
+
+WAR = [
+    "227685510519324672",
+    "1102563005704712263"
+]
+
+global_config = None
 
 @bot.event
 async def on_ready():
@@ -37,6 +45,10 @@ async def on_ready():
     load_definitions()
     init_generic_word_db()
     init_tips()
+
+    # Load the global config
+    guilds = [str(guild.id) for guild in bot.guilds]
+    init_config(guilds)
 
 @bot.event
 async def on_guild_join(guild):
@@ -66,7 +78,6 @@ async def on_guild_remove(guild):
 
 @bot.event(name="on_message_create")
 async def on_message(message):
-    now = datetime.datetime.now()
     if message.author.bot:
         return
     
@@ -77,17 +88,16 @@ async def on_message(message):
     nwords = nword_counter(content)
     total = nwords[0] + nwords[1]
 
+    # if is_alerts(str(message.guild_id)): return
+    # The N word alerts are always on
     if total > 0:
         await ctx.send(f"**{message.author.mention}** has said the n-word {total} {'time' if total == 1 else 'times'}, {nwords[1]} of which {'was' if nwords[1] == 1 else 'were'} a hard r!")
         insert_json_db(str(message.author.mention), nwords[0], nwords[1])
 
-    done = datetime.datetime.now()
-    print(f"nword detect took {done - now} seconds")
 
 
 @bot.event(name="on_message_create")
 async def on_message_custom(message):
-    now = datetime.datetime.now()
     if message.author.bot:
         return
     
@@ -99,16 +109,23 @@ async def on_message_custom(message):
     words = generic_word_counter(guild.id, content, str(message.author.mention))
 
     # Assemble the message to alert members
+    if is_alerts(str(message.guild_id)): return
     if len(words) > 0:
         msg = f"**{message.author.mention}** said the following words: \n"
         for word in words:
             msg += f"`{word} x {words[word]}`\n "
 
         await ctx.send(msg)
-    
-    done = datetime.datetime.now()
-    print(f"generic word detect took {done - now} seconds")
 
+@bot.event(name="on_message_create")
+async def the_fine_bros(message):
+    # return
+    if str(message.author.id) in WAR: # The Fine Bros react to harrison
+        await message.create_reaction("👎")
+        await message.reply("Bender tosser wanker")
+    
+    if str(message.author.id) == "526983628408881179":
+        await message.reply("not slay")
 
 @bot.command(
     name="nword",
@@ -368,6 +385,16 @@ async def subscribe(ctx):
     
     await ctx.send("Successfully subscribed to tips")
 
+@bot.command(
+    name="toggle_alerts",
+    description="Toggle alerts on this server"
+)
+async def toggle_alerts(ctx):
+    server = str(ctx.guild_id)
+    config = get_config(server)
+    set_alerts(server, not config['alerts'])
+    await ctx.send(f"Alerts are now {'on' if config['alerts'] else 'off'}")
+
 # This part runs tip messages.
 @create_task(DateTimeTrigger(datetime.datetime.now() + datetime.timedelta(seconds=5)))
 async def tip_task():
@@ -381,5 +408,13 @@ async def tip_task():
             await channel.send(random_tip())
 
 # tip_task.start() broken
+
+@bot.event(
+    name="guild_audit_log_entry_create"
+)
+async def on_guild_audit_log_entry_create(entry):
+    print(entry)
+
+
 
 bot.start()
