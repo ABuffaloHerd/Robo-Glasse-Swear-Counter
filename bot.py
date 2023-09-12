@@ -23,7 +23,7 @@ intents = discord.Intents.default()
 bot = interactions.Client(token=TOKEN, intents=interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGE_CONTENT)
 
 WAR = [
-    "227685510519324672",
+    #"227685510519324672",
     "1102563005704712263"
 ]
 
@@ -118,14 +118,29 @@ async def on_message_custom(message):
         await ctx.send(msg)
 
 @bot.event(name="on_message_create")
+async def kys(message):
+    if message.author.bot:
+        return
+    
+    content = message.content.lower()
+    ctx = await message.get_channel()
+    guild = await message.get_guild()
+
+    if any(word in content for word in ['slay']):
+        await message.reply("kys")
+
+@bot.event(name="on_message_create")
 async def the_fine_bros(message):
     # return
     if str(message.author.id) in WAR: # The Fine Bros react to harrison
         await message.create_reaction("👎")
-        await message.reply("Bender tosser wanker")
+        # await message.reply("Bender tosser wanker")
     
     if str(message.author.id) == "526983628408881179":
-        await message.reply("not slay")
+        return
+        # await message.reply("not slay")
+        # await message.create_reaction("🤡")
+        # await message.create_reaction(":yay:")
 
 @bot.command(
     name="nword",
