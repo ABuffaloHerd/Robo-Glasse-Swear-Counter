@@ -127,7 +127,7 @@ async def kys(message):
     guild = await message.get_guild()
 
     if any(word in content for word in ['slay']):
-        await message.reply("kys")
+        await message.create_reaction("😐")
 
 @bot.event(name="on_message_create")
 async def the_fine_bros(message):

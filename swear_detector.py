@@ -6,8 +6,8 @@ import re
 
 nwords = []
 
-REGEX_NWORD_HARDR = re.compile(r'\b(n*[1i!l]+[g9]{2,}[3e]+[r5]+)\b', re.IGNORECASE)
-REGEX_NWORD = re.compile(r'\b(n*[1i!l]+[g9]{2,}[a4]+)\b', re.IGNORECASE)
+REGEX_NWORD_HARDR = re.compile(r'(n*[1i!l]+[g9]{2,}[3e]+[r5]+s*)', re.IGNORECASE)
+REGEX_NWORD = re.compile(r'(n*[1i!l]+[g9]{2,}[a4]+s*)', re.IGNORECASE)
 
 # Returns the number of times the n-word has been said in the text, as well as hard rs in a tuple
 # Caller is responsible for updating the json database
