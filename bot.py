@@ -13,6 +13,7 @@ from embed import CustomEmbed
 from word_detector import *
 from misc import *
 from time_trigger import DateTimeTrigger
+from twitter import *
 
 from discord.ext import commands
 
@@ -128,6 +129,20 @@ async def kys(message):
 
     if any(word in content for word in ['slay']):
         await message.create_reaction("😐")
+
+@bot.event(name="on_message_create")
+async def twitter_replacer(message):
+    if message.author.bot:
+        return
+    
+    content = message.content.lower()
+    ctx = await message.get_channel()
+    guild = await message.get_guild()
+
+    if is_twitter_link(message.content.lower()):
+        # replace twitter or x with vxtwitter
+        await message.reply(replace_twitter_link(message.content.lower()))
+
 
 @bot.event(name="on_message_create")
 async def the_fine_bros(message):

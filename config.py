@@ -16,7 +16,13 @@ def get_config(server):
         return json.load(f)[server]
     
 def is_alerts(server):
-    return get_config(server)['alerts']
+    try:
+        return get_config(server)['alerts']
+    except KeyError:
+        # Server not in config.json, add it
+        with open('config.json', 'r') as f:
+            data = json.load(f)
+            data[server] = {"alerts" : False}
 
 def set_alerts(server, value : bool):
     with open('config.json', 'r') as f:
