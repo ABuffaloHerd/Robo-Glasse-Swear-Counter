@@ -92,7 +92,7 @@ async def on_message(message):
     # if is_alerts(str(message.guild_id)): return
     # The N word alerts are always on
     if total > 0:
-        await ctx.send(f"**{message.author.mention}** has said the n-word {total} {'time' if total == 1 else 'times'}, {nwords[1]} of which {'was' if nwords[1] == 1 else 'were'} a hard r!")
+        await ctx.send(f"@everyone: **{message.author.mention}** has said the n-word **{total}** {'time' if total == 1 else 'times'}, {nwords[1]} of which **{'was' if nwords[1] == 1 else 'were'}** a hard r!")
         insert_json_db(str(message.author.mention), nwords[0], nwords[1])
 
 
